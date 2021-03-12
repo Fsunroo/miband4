@@ -634,15 +634,9 @@ class miband(Peripheral):
             self._char_chunked.write(chunk)
             remaining-=copybytes
 
-<<<<<<< HEAD
     def setTrack(self, state, artist=None, album=None, track=None,
                  volume=None,
                  position=None, duration=None):
-=======
-
-    def setTrack(self,track,state):
-        self.track = track
->>>>>>> gyro/vibrate_and_gyro
         self.pp_state = state
         self.artist = artist
         self.album = album
@@ -671,32 +665,12 @@ class miband(Peripheral):
         if focusout is not None:
             self._default_music_focus_out = focusout
 
-<<<<<<< HEAD
     def setAlarm(self, hour, minute, days=(), enabled=True, snooze=True,
                  alarm_id=0):
         '''Set an alarm at HOUR and MINUTE, on DAYS days.  Up to 3 alarms can be set.
         ENABLED can be used to remove an alarm.
         When SNOOZE is True, the alarm band will display a snooze button.'''
         char = self.svc_1.getCharacteristics(UUIDS.CHARACTERISTIC_CONFIGURATION)[0]
-=======
-
-    def setMusic(self):
-        track = self.track
-        state = self.pp_state
-        # st=b"\x01\x00\x01\x00\x00\x00\x01\x00"
-        #self.writeChunked(3,st)
-        flag = 0x00
-        flag |=0x01
-        length =8
-        if(len(track)>0):
-            length+=len(track.encode('utf-8'))
-            flag |=0x0e
-        buf = bytes([flag])+bytes([state])+bytes([1,0,0,0])+bytes([1,0])
-        if(len(track)>0):
-            buf+=bytes(track,'utf-8')
-            buf+=bytes([0])
-        self.writeChunked(3,buf)
->>>>>>> gyro/vibrate_and_gyro
 
         alarm_tag = alarm_id
         if enabled:
@@ -704,7 +678,6 @@ class miband(Peripheral):
             if not snooze:
                 alarm_tag |= 0x40
 
-<<<<<<< HEAD
         repetition_mask = 0x00
         for day in days:
             repetition_mask |= day
@@ -742,200 +715,6 @@ class miband(Peripheral):
             position = struct.pack('<H', self.position)
         else:
             position = null + null
-=======
-    def write_cmd(self, characteristic, data, response=False, queued=False):
-        if queued:
-            self.write_queue.put(['write_cmd', [characteristic, data, response]])
-        else:
-            characteristic.write(data, withResponse=response)
-
-
-    def write_req(self, handle, data, response=True, queued=False):
-        if queued:
-            self.write_queue.put(['write_req', [handle, data, response]])
-        else:
-            self.writeCharacteristic(handle, data, withResponse=response)
-
-
-    def process_write_queue(self):
-        while True:
-            try:
-                res = self.write_queue.get(False)
-                _type = res[0]
-                _payload = res[1]
-                if _type == 'write_cmd':
-                    self.write_cmd(_payload[0], _payload[1], response=_payload[2])
-                elif _type == 'write_req':
-                    self.write_req(_payload[0], _payload[1], response=_payload[2])
-            except Empty:
-                break
-
-
-    def wait_for_notifications_with_queued_writes(self, wait):
-        self.process_write_queue()
-        self.waitForNotifications(wait)
-
-
-    def vibrate(self, value):
-        # Set queued to True when multithreading
-        #  Otherwise waitForNotifications will received an invalid 'wr' response
-
-        if value == 255 or value == 0:
-            # '255' means 'continuous vibration' 
-            #   I've arbitrarily assigned the otherwise pointless value of '0' to indicate 'stop_vibration'
-            #   These modes do not require pulse timing to avoid strange behavior
-            self.write_cmd(self._char_alert, BYTEPATTERNS.vibration(value), queued=True)
-        else:
-            # A value of '150' will vibrate for ~200ms, hence vibration_scaler.
-            #   This isn't exact however, but does leave a ~5ms gap between pulses.
-            #   A scaler any lower causes the pulses to be indistinguishable from each other to a human
-            #   I considered making this function accept a desired amount of vibration time in ms, 
-            #   however it was fiddly and I couldn't get it right.  More work could be done here.
-            vibration_scaler = 0.75  
-            ms = round(value / vibration_scaler)
-            vibration_duration = ms / 1000
-            self.write_cmd(self._char_alert, BYTEPATTERNS.vibration(value), queued=False)
-            time.sleep(vibration_duration)
-
-
-    def generate_random_vibration_pattern(self, pulse_count):
-        #pulse_duration_range and pulse_interval_range_ms are arbitrary
-        pulse_duration_range = {
-                                    'low': 60, 
-                                    'high': 100
-                                }  
-        pulse_interval_range_ms = {
-                                    'low': 100, 
-                                    'high': 800
-                                }
-
-        output_pulse_pattern = []
-        for _ in range(pulse_count):
-            pulse_duration = random.randrange(pulse_duration_range['low'], pulse_duration_range['high'])
-            pulse_interval = random.randrange(pulse_interval_range_ms['low'], pulse_interval_range_ms['high'])/1000
-            output_pulse_pattern.append([pulse_duration, pulse_interval])
-        return output_pulse_pattern
-
-
-    def vibrate_random(self, duration_seconds):
-        print("Sending random vibration...")
-        duration_start = time.time()
-
-        pattern_length = 20  #This value is arbitrary
-
-        pulse_pattern = self.generate_random_vibration_pattern(pattern_length)
-
-        while True:
-            if (time.time() - duration_start) >= duration_seconds:
-                print ("Stopping vibration")
-                self.vibrate(0)
-                break
-            else:
-                for pattern in pulse_pattern:
-                    if (time.time() - duration_start) >= duration_seconds:
-                        break
-                    vibrate_ms = pattern[0]
-                    vibro_delay = pattern[1]
-                    self.vibrate(vibrate_ms)
-                    time.sleep(vibro_delay)
-
-
-    def vibrate_pattern(self, duration_seconds):
-        print("Sending vibration...")
-        duration_start = time.time()
-
-        #This pattern is an example.
-        pulse_pattern = [[30, 0.01], [60, 0.01], [90, 0.01], [120, 0.01], [150, 0.01], [180, 0.01]]
-
-        while True:
-            if (time.time() - duration_start) >= duration_seconds:
-                print ("Stopping vibration")
-                self.vibrate(0)
-                break
-            else:
-                for pattern in pulse_pattern:
-                    if (time.time() - duration_start) >= duration_seconds:
-                        break
-                    vibrate_ms = pattern[0]
-                    vibro_delay = pattern[1]
-                    self.vibrate(vibrate_ms)
-                    time.sleep(vibro_delay)
-
-
-    def vibrate_rolling(self, duration_seconds):
-        print("Sending rolling vibration...")
-
-        duration_start = time.time()
-        
-        while True:
-            if (time.time() - duration_start) >= duration_seconds:
-                print ("Stopping vibration")
-                self.vibrate(0)
-                break
-            else:
-                for x in range(10):
-                    for x in range(20, 40, 1):
-                        self.vibrate(x)
-                    for x in range(40, 20, -1):
-                        self.vibrate(x)
-
-
-    def send_gyro_start(self, sensitivity):
-        if not self.gyro_started_flag:
-            self._log.info("Starting gyro...")
-            self.write_req(self._sensor_handle, BYTEPATTERNS.start)
-            self.write_req(self._steps_handle, BYTEPATTERNS.start)
-            self.write_req(self._hz_handle, BYTEPATTERNS.start)
-            self.gyro_started_flag = True
-        self.write_cmd(self._char_sensor, BYTEPATTERNS.gyro_start(sensitivity))
-        self.write_req(self._sensor_handle, BYTEPATTERNS.stop)
-        self.write_cmd(self._char_sensor, b'\x02')
-
-
-    def send_heart_measure_start(self):
-        self._log.info("Starting heart measure...")
-        self.write_cmd(self._char_heart_ctrl, BYTEPATTERNS.stop_heart_measure_manual, response=True)
-        self.write_cmd(self._char_heart_ctrl, BYTEPATTERNS.stop_heart_measure_continues, response=True)
-        self.write_req(self._heart_measure_handle, BYTEPATTERNS.start)
-        self.write_cmd(self._char_heart_ctrl, BYTEPATTERNS.start_heart_measure_continues, response=True)
-
-
-    def send_heart_measure_keepalive(self):
-        self.write_cmd(self._char_heart_ctrl, BYTEPATTERNS.heart_measure_keepalive, response=True)
-
-
-    def start_heart_and_gyro_realtime(self, sensitivity, callback):
-        self.heart_measure_callback = callback
-        self.gyro_raw_callback = callback
-
-        self.send_gyro_start(sensitivity)
-        self.send_heart_measure_start()
-
-        heartbeat_time = time.time()
-        while True:
-            self.wait_for_notifications_with_queued_writes(0.5)
-            self._parse_queue()
-            if (time.time() - heartbeat_time) >= 12:
-                heartbeat_time = time.time()
-                self.send_heart_measure_keepalive()
-                self.send_gyro_start(sensitivity)
-
-    def start_gyro_realtime(self, sensitivity, callback, avg=False):
-        if avg:
-            self.gyro_avg_callback = callback
-        else:
-            self.gyro_raw_callback = callback
-
-        self.send_gyro_start(sensitivity)
-
-        heartbeat_time = time.time()
-        while True:
-            self.wait_for_notifications_with_queued_writes(0.5)
-            self._parse_queue()
-            if (time.time() - heartbeat_time) >= 60:
-                heartbeat_time = time.time()
-                self.send_gyro_start(sensitivity)
->>>>>>> gyro/vibrate_and_gyro
 
         buf = bytes([flag, self.pp_state, 0x00]) + position + buf
         self.writeChunked(3, buf)
