@@ -2,6 +2,8 @@ auth_key.txt
 tester.py
 test.py
 .vscode/
+miband*.txt
+mac.txt
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
