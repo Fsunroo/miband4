@@ -154,7 +154,8 @@ class QUEUE_TYPES(object):
     HEART = 'heart'
     RAW_GYRO = 'raw_gyro'
     RAW_HEART = 'raw_heart'
-    AVG_GYRO = 'avg_gyro'
+<<<<<<< HEAD
+
 class Weekdays(object):
 
     __metaclass__ = Immutable
@@ -167,3 +168,6 @@ class Weekdays(object):
     saturday  = 0x01 << 5
     sunday    = 0x01 << 6
     everyday  = 0x01 << 7
+=======
+    AVG_GYRO = 'avg_gyro'
+>>>>>>> gyro/vibrate_and_gyro
