@@ -634,15 +634,9 @@ class miband(Peripheral):
             self._char_chunked.write(chunk)
             remaining-=copybytes
 
-<<<<<<< HEAD
     def setTrack(self, state, artist=None, album=None, track=None,
                  volume=None,
                  position=None, duration=None):
-=======
-
-    def setTrack(self,track,state):
-        self.track = track
->>>>>>> gyro/vibrate_and_gyro
         self.pp_state = state
         self.artist = artist
         self.album = album
@@ -671,40 +665,17 @@ class miband(Peripheral):
         if focusout is not None:
             self._default_music_focus_out = focusout
 
-<<<<<<< HEAD
     def setAlarm(self, hour, minute, days=(), enabled=True, snooze=True,
                  alarm_id=0):
         '''Set an alarm at HOUR and MINUTE, on DAYS days.  Up to 3 alarms can be set.
         ENABLED can be used to remove an alarm.
         When SNOOZE is True, the alarm band will display a snooze button.'''
         char = self.svc_1.getCharacteristics(UUIDS.CHARACTERISTIC_CONFIGURATION)[0]
-=======
-
-    def setMusic(self):
-        track = self.track
-        state = self.pp_state
-        # st=b"\x01\x00\x01\x00\x00\x00\x01\x00"
-        #self.writeChunked(3,st)
-        flag = 0x00
-        flag |=0x01
-        length =8
-        if(len(track)>0):
-            length+=len(track.encode('utf-8'))
-            flag |=0x0e
-        buf = bytes([flag])+bytes([state])+bytes([1,0,0,0])+bytes([1,0])
-        if(len(track)>0):
-            buf+=bytes(track,'utf-8')
-            buf+=bytes([0])
-        self.writeChunked(3,buf)
->>>>>>> gyro/vibrate_and_gyro
-
         alarm_tag = alarm_id
         if enabled:
             alarm_tag |= 0x80
             if not snooze:
                 alarm_tag |= 0x40
-
-<<<<<<< HEAD
         repetition_mask = 0x00
         for day in days:
             repetition_mask |= day
@@ -742,7 +713,9 @@ class miband(Peripheral):
             position = struct.pack('<H', self.position)
         else:
             position = null + null
-=======
+        buf = bytes([flag, self.pp_state, 0x00]) + position + buf
+        self.writeChunked(3, buf)
+
     def write_cmd(self, characteristic, data, response=False, queued=False):
         if queued:
             self.write_queue.put(['write_cmd', [characteristic, data, response]])
@@ -935,7 +908,3 @@ class miband(Peripheral):
             if (time.time() - heartbeat_time) >= 60:
                 heartbeat_time = time.time()
                 self.send_gyro_start(sensitivity)
->>>>>>> gyro/vibrate_and_gyro
-
-        buf = bytes([flag, self.pp_state, 0x00]) + position + buf
-        self.writeChunked(3, buf)
