@@ -3,16 +3,13 @@
 ![Commit](https://img.shields.io/github/last-commit/satcar77/miband4) 
 ![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)
 
-# MIBAND 4 - Python Library
+# MIBAND 4 - Python Slide Control
 
-> Library to interact with Xiaomi MiBand4. 
+> Library to control Slides with Xiaomi MiBand4. 
 > Only works on linux.
-![demo](screen/1.png)
+ 
 
-## Updates(3/1/2021)
-- Alarm functionality. 
-
-## Updates(10/27/2020)
+## Updates(3/15/2021)
 - (New Feature) Custom watchface files(.bin) support. 
 - Firmware restore/update fixes.
 
@@ -40,21 +37,6 @@ sqlite3 /data/data/com.xiaomi.hm.health/databases/origin_db_[YOURDBNAMEHERE] "se
 On a **non rooted phone** you may consider using https://www.freemyband.com/ 
 
 **NOTICE**: Every time you hard reset the band/watch, the Bluetooth MAC Address will be changed and you must grab a new key! Also, anytime you unpair your band/watch from MiFit, the pairing key will be invalidated and you must make new pairing in MiFit app.
-
-### Features that work without authkey
-- Sending Calls
-- Sending alerts
-- Sending Missed call notifications
-- Retrieving device info
-- Sending music title and music state(Playing/Paused)
-- Recieve music control events (Play/Pause/Forward/Backward/Volume Up/Volume Down/Enter Music app/ Exit Music app) through callbacks
-### Features that needs authkey
-- Updating watchface of the band
-- Retrieving heart rate (Realtime and Single time)
-- Firmware update/restore (This feature has the potential to brick your Mi Band 4. Do it at your own risk)
-- Retrieving steps count, calories count and fat burnt
-- Setting date and time
-- Fetching fitness data within certain past intervals.
 
 
 # Setup and demo
@@ -86,8 +68,6 @@ On a **non rooted phone** you may consider using https://www.freemyband.com/
     ```
     python3 miband4_console.py -m MAC_ADDRESS 
 	```
-
-
 
 
 
