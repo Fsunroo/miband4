@@ -10,8 +10,7 @@
  
 
 ## Updates(3/15/2021)
-- (New Feature) Custom watchface files(.bin) support. 
-- Firmware restore/update fixes.
+- smaller version of master which allows you to get commands to your linux machine with miband4
 
 ## Contributors 
 
