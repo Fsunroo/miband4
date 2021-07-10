@@ -5,9 +5,11 @@ class detector(miband):
     def __init__(self):
         with open("mac.txt", "r") as f:
             MAC_ADDR = f.read().strip()
+            f.close()
 
         with open("auth_key.txt", "r") as f:
             AUTH_KEY= f.read().strip()
+            f.close()
         AUTH_KEY = bytes.fromhex(AUTH_KEY)
 
         if (AUTH_KEY):
