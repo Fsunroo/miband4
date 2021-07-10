@@ -25,6 +25,7 @@ class detector(miband):
 
     def detect_state(self,data):
         d=data[0]
+        #print(f"{d['gyro_raw_x']}  ,  {d['gyro_raw_y']}  ,  {d['gyro_raw_z']}")
         if d['gyro_raw_x']>150:   #dast oftade
             if d['gyro_raw_y']<12:
                 self.tempstate='R'
