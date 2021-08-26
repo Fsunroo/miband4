@@ -1,3 +1,9 @@
+<div align="center" id="top"> 
+  <img src="./.github/file.gif" alt="ArzeshYabi" />
+
+  &#xa0;
+
+</div>
 
 ![Requirements](https://img.shields.io/badge/Python-3.6-lightgrey)
 ![Commit](https://img.shields.io/github/last-commit/satcar77/miband4) 
